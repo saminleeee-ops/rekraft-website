@@ -1,12 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function REKCraftWebsite() {
+  const [content, setContent] = useState(null);
   const [cartCount, setCartCount] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [email, setEmail] = useState('');
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactMessage, setContactMessage] = useState('');
+
+  // JSON 파일에서 콘텐츠 불러오기
+  useEffect(() => {
+    fetch('/content.json')
+      .then(res => res.json())
+      .then(data => setContent(data))
+      .catch(err => console.error('Failed to load content:', err));
+  }, []);
 
   const products = [
     {
@@ -66,6 +75,8 @@ export default function REKCraftWebsite() {
     setContactMessage('');
   };
 
+  if (!content) return <div style={{ padding: '2rem', textAlign: 'center' }}>로딩 중...</div>;
+
   return (
     <div style={{ fontFamily: "'Segoe UI', sans-serif", color: '#2A2A2A', lineHeight: 1.6 }}>
       {/* 헤더 */}
@@ -103,12 +114,11 @@ export default function REKCraftWebsite() {
         </nav>
       </header>
 
-      {/* === 1. 히어로 섹션: 강력한 가치 제안 === */}
+      {/* === 히어로 섹션 === */}
       <section style={{
         background: 'linear-gradient(135deg, #F5F1E8 0%, white 100%)',
         padding: '8rem 2rem',
-        textAlign: 'center',
-        position: 'relative'
+        textAlign: 'center'
       }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <h1 style={{
@@ -116,9 +126,9 @@ export default function REKCraftWebsite() {
             fontWeight: 700,
             color: '#C97FB0',
             marginBottom: '1.5rem',
-            lineHeight: 1.2
+            whiteSpace: 'pre-line'
           }}>
-            포장(Packaging)보다<br/>과정(Process)에 가치를 둡니다.
+            {content.hero.mainTitle}
           </h1>
           <p style={{
             fontSize: '1.2rem',
@@ -127,11 +137,10 @@ export default function REKCraftWebsite() {
             lineHeight: 1.8,
             fontWeight: 500,
             maxWidth: '800px',
-            margin: '0 auto 2.5rem'
+            margin: '0 auto 2.5rem',
+            whiteSpace: 'pre-line'
           }}>
-            수만 킬로미터를 날아온 플라스틱 속의 전통이 아닌,<br/>
-            당신의 손끝에서 현지 재료와 한국의 기법이 만나 탄생하는<br/>
-            <strong style={{ color: '#C97FB0', fontWeight: 700 }}>하이퍼 로컬(Hyper-local)</strong>의 아름다움을 경험하세요.
+            {content.hero.subTitle}
           </p>
           <button style={{
             padding: '1.2rem 3rem',
@@ -142,51 +151,28 @@ export default function REKCraftWebsite() {
             fontSize: '1rem',
             fontWeight: 600,
             cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(201, 127, 176, 0.3)',
-            transition: 'all 0.3s'
-          }} onMouseEnter={(e) => {
-            e.target.style.transform = 'translateY(-2px)';
-            e.target.style.boxShadow = '0 6px 16px rgba(201, 127, 176, 0.4)';
-          }} onMouseLeave={(e) => {
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = '0 4px 12px rgba(201, 127, 176, 0.3)';
+            boxShadow: '0 4px 12px rgba(201, 127, 176, 0.3)'
           }}>
-            지속 가능한 워크숍 파트너십 시작하기
+            {content.hero.ctaButton}
           </button>
         </div>
       </section>
 
-      {/* === 2. 문제 제기 섹션: 우리가 해결하려는 모순 === */}
+      {/* === 문제 섹션 === */}
       <section style={{ background: '#F5F1E8', padding: '5rem 2rem' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <h2 style={{
             fontSize: '2.8rem',
             color: '#C97FB0',
             textAlign: 'center',
-            marginBottom: '2rem',
+            marginBottom: '3rem',
             fontWeight: 700,
-            lineHeight: 1.3
+            whiteSpace: 'pre-line'
           }}>
-            우리는 혹시 문화를<br/>'언박싱(Unboxing)'하고 있지는 않나요?
+            {content.problem.headline}
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2.5rem', marginTop: '3rem' }}>
-            {[
-              {
-                icon: '📦',
-                title: '언박싱의 역설',
-                desc: '30명이 동시에 자신의 유산을 언박싱하는 풍경은 기이한 일면을 보여줍니다.'
-              },
-              {
-                icon: '🌍',
-                title: '시간의 모순',
-                desc: '고대 전통의 미학을 누리기 위해 현대의 공격적인 탄소 배출 메커니즘을 사용해야 할까요?'
-              },
-              {
-                icon: '🗑️',
-                title: '의미의 상실',
-                desc: '단순히 장식되다 버려지는 "의미 없는 전시물"은 이제 그만.'
-              }
-            ].map((item, idx) => (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2.5rem' }}>
+            {content.problem.items.map((item, idx) => (
               <div key={idx} style={{
                 background: 'white',
                 padding: '2.5rem',
@@ -206,58 +192,26 @@ export default function REKCraftWebsite() {
         </div>
       </section>
 
-      {/* === 3. 솔루션 섹션: RE:K-Craft의 철학 === */}
+      {/* === 철학 섹션 === */}
       <section id="philosophy" style={{ background: 'white', padding: '5rem 2rem' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
           <h2 style={{
             fontSize: '2.8rem',
             color: '#C97FB0',
             textAlign: 'center',
-            marginBottom: '1rem',
-            fontWeight: 700
-          }}>
-            전통은 재료가 아닌
-          </h2>
-          <h2 style={{
-            fontSize: '2.8rem',
-            color: '#C97FB0',
-            textAlign: 'center',
             marginBottom: '3rem',
-            fontWeight: 700
+            fontWeight: 700,
+            whiteSpace: 'pre-line'
           }}>
-            '방법론(Methodology)'에 살아 숨 쉽니다.
+            {content.philosophy.headline}
           </h2>
-          
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2.5rem' }}>
-            {[
-              {
-                icon: '🤝',
-                title: '로컬과의 조화',
-                desc: '한국의 기법을 현지의 재료에 적용할 때, 두 문화의 아름다운 결합이 시작됩니다.'
-              },
-              {
-                icon: '🌿',
-                title: '본질로의 회귀',
-                desc: '주변 환경과 공생하며 모든 재료를 아꼈던 전통 장인들의 "제로 웨이스트" 정신을 현대적으로 계승합니다.'
-              },
-              {
-                icon: '🌏',
-                title: '지속 가능한 연결',
-                desc: '물리적 물류 체인에서 벗어나, 문화 간의 진정한 인간적 연결에 집중합니다.'
-              }
-            ].map((item, idx) => (
+            {content.philosophy.items.map((item, idx) => (
               <div key={idx} style={{
                 background: 'linear-gradient(135deg, #FAFAF8 0%, #F5F1E8 100%)',
                 padding: '2.5rem',
                 borderRadius: '12px',
-                border: '2px solid #E8E8E8',
-                transition: 'all 0.3s'
-              }} onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-6px)';
-                e.currentTarget.style.boxShadow = '0 12px 24px rgba(201, 127, 176, 0.2)';
-              }} onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
+                border: '2px solid #E8E8E8'
               }}>
                 <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{item.icon}</div>
                 <h3 style={{ color: '#C97FB0', marginBottom: '1rem', fontSize: '1.2rem', fontWeight: 700 }}>
@@ -272,28 +226,18 @@ export default function REKCraftWebsite() {
         </div>
       </section>
 
-      {/* === 4. 기대 효과 섹션: 고객이 얻는 가치 === */}
+      {/* === 기대 효과 섹션 === */}
       <section style={{ background: '#F5F1E8', padding: '5rem 2rem' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
           <h2 style={{
             fontSize: '2.8rem',
             color: '#C97FB0',
             marginBottom: '2rem',
-            fontWeight: 700
+            fontWeight: 700,
+            whiteSpace: 'pre-line'
           }}>
-            배움의 지혜가 당신의<br/>진정한 기념품이 됩니다.
+            {content.benefit.headline}
           </h2>
-          <p style={{
-            fontSize: '1.1rem',
-            color: '#666',
-            marginBottom: '2rem',
-            lineHeight: 1.8,
-            maxWidth: '700px',
-            margin: '0 auto 2rem'
-          }}>
-            한 번 쓰고 버려질 기념품 대신,<br/>
-            당신의 삶을 풍요롭게 할 영원한 기술을 가져가세요.
-          </p>
           <p style={{
             fontSize: '1.4rem',
             color: '#C97FB0',
@@ -301,19 +245,12 @@ export default function REKCraftWebsite() {
             fontStyle: 'italic',
             marginBottom: '1rem'
           }}>
-            "The knowledge becomes the true souvenir."
-          </p>
-          <p style={{
-            fontSize: '0.9rem',
-            color: '#666',
-            marginBottom: '2rem'
-          }}>
-            당신이 배운 그 지식이 가장 가치 있는 유산입니다.
+            "{content.benefit.quote}"
           </p>
         </div>
       </section>
 
-      {/* 제품 섹션 */}
+      {/* === 제품 섹션 === */}
       <section id="shop" style={{ padding: '4rem 2rem', background: 'white' }}>
         <h2 style={{ fontSize: '2.2rem', color: '#C97FB0', textAlign: 'center', marginBottom: '3rem', fontWeight: 700 }}>
           지속 가능한 제품 & 서비스
@@ -324,16 +261,8 @@ export default function REKCraftWebsite() {
               background: '#FAFAF8',
               padding: '2rem',
               borderRadius: '12px',
-              border: '1px solid #E8E8E8',
-              cursor: 'pointer',
-              transition: 'all 0.3s'
-            }} onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-4px)';
-              e.currentTarget.style.boxShadow = '0 8px 16px rgba(201, 127, 176, 0.15)';
-            }} onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}>
+              border: '1px solid #E8E8E8'
+            }} onClick={() => handleAddToCart(product)}>
               <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{product.icon}</div>
               <h3 style={{ color: '#C97FB0', marginBottom: '0.5rem', fontSize: '1.1rem', fontWeight: 700 }}>{product.name}</h3>
               <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem', lineHeight: 1.5 }}>
@@ -350,28 +279,18 @@ export default function REKCraftWebsite() {
               }}>
                 🌱 {product.sustainability}
               </div>
-              <div style={{ color: '#7BA89F', fontWeight: 600, marginBottom: '0.5rem', fontSize: '0.9rem' }}>
-                👥 {product.participants}
-              </div>
               <div style={{ fontSize: '1.3rem', color: '#C97FB0', fontWeight: 700, marginBottom: '1.5rem' }}>
                 ₩{product.price.toLocaleString()}
               </div>
               <button style={{
                 width: '100%',
-                padding: '0.8rem 1.5rem',
+                padding: '0.8rem',
                 background: '#7BA89F',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
                 cursor: 'pointer',
-                fontWeight: 600,
-                transition: 'all 0.3s'
-              }} onClick={() => handleAddToCart(product)} onMouseEnter={(e) => {
-                e.target.style.background = '#6A9A8D';
-                e.target.style.transform = 'scale(1.02)';
-              }} onMouseLeave={(e) => {
-                e.target.style.background = '#7BA89F';
-                e.target.style.transform = 'scale(1)';
+                fontWeight: 600
               }}>
                 장바구니에 추가
               </button>
@@ -396,7 +315,7 @@ export default function REKCraftWebsite() {
         )}
       </section>
 
-      {/* B2B 솔루션 섹션 */}
+      {/* === B2B 섹션 === */}
       <section id="b2b" style={{ background: '#F5F1E8', padding: '4rem 2rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <h2 style={{ fontSize: '2.2rem', color: '#C97FB0', marginBottom: '3rem', fontWeight: 700 }}>
@@ -420,7 +339,7 @@ export default function REKCraftWebsite() {
                   '전담 파트너 매니저'
                 ].map((feature, idx) => (
                   <li key={idx} style={{ paddingLeft: '1.8rem', marginBottom: '1rem', color: '#666', position: 'relative', fontSize: '0.95rem' }}>
-                    <span style={{ position: 'absolute', left: 0, color: '#7BA89F', fontWeight: 'bold', fontSize: '1.2rem' }}>✓</span>
+                    <span style={{ position: 'absolute', left: 0, color: '#7BA89F', fontWeight: 'bold' }}>✓</span>
                     {feature}
                   </li>
                 ))}
@@ -434,9 +353,6 @@ export default function REKCraftWebsite() {
             }}>
               <p style={{ fontSize: '1.2rem', color: '#C97FB0', fontWeight: 700, marginBottom: '1rem' }}>
                 파트너십 준비 완료?
-              </p>
-              <p style={{ color: '#666', marginBottom: '1.8rem', fontSize: '0.95rem', lineHeight: 1.6 }}>
-                역사적 의상을 입은 산업화된 공예를 넘어,<br/>진정한 문화를 만나보세요.
               </p>
               <form onSubmit={handleContactSubmit} style={{ display: 'grid', gap: '1.2rem' }}>
                 <input
@@ -488,7 +404,7 @@ export default function REKCraftWebsite() {
                   fontWeight: 600,
                   cursor: 'pointer'
                 }}>
-                  지속 가능한 워크숍 파트너십 시작하기
+                  상담 예약하기
                 </button>
               </form>
             </div>
@@ -496,7 +412,7 @@ export default function REKCraftWebsite() {
         </div>
       </section>
 
-      {/* 뉴스레터 섹션 */}
+      {/* === 뉴스레터 === */}
       <section style={{
         background: 'linear-gradient(135deg, #C97FB0 0%, #7BA89F 100%)',
         color: 'white',
@@ -506,16 +422,14 @@ export default function REKCraftWebsite() {
         <h2 style={{ color: 'white', marginBottom: '1rem', fontSize: '1.8rem', fontWeight: 700 }}>
           친환경 K-공예 매뉴얼 보기
         </h2>
-        <p style={{ marginBottom: '2rem', fontSize: '1rem', opacity: 0.95 }}>
-          우리의 지속 가능한 운영 가이드를 다운로드하고 당신의 기관에 맞게 커스터마이징하세요.
-        </p>
         <form onSubmit={handleNewsletterSubmit} style={{
           display: 'flex',
           gap: '0.7rem',
           maxWidth: '550px',
           margin: '0 auto',
           flexWrap: 'wrap',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          marginTop: '2rem'
         }}>
           <input
             type="email"
@@ -554,14 +468,9 @@ export default function REKCraftWebsite() {
         textAlign: 'center',
         fontSize: '0.9rem'
       }}>
-        <p style={{ margin: '0 0 1rem', fontSize: '0.95rem', fontWeight: 500 }}>
-          © 2026 RE:K-Craft 솔루션
-        </p>
+        <p style={{ margin: '0 0 1rem' }}>© 2026 RE:K-Craft 솔루션</p>
         <p style={{ margin: '0.5rem 0', fontSize: '0.85rem', color: '#aaa' }}>
           포장이 아닌 과정, 플라스틱이 아닌 문화. 🌿
-        </p>
-        <p style={{ margin: '1rem 0 0', fontSize: '0.85rem', color: '#999' }}>
-          서울 | contact@rekcraft.com | +82-2-XXXX-XXXX
         </p>
       </footer>
     </div>
